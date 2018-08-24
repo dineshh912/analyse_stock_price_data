@@ -1,6 +1,6 @@
 # analyse_stock_price_data
 
-This S&P500-Analysis folder contain the Finance Data Analysis of S&P 500 Companies Got the open,close,high,low,volume values  from yahoo finance.
+This S&P500-Analysis folder contain the Finance Data Analysis of S&P 500 Companies Got the open,close,high,low,volume values  from yahoo finance. and did the pridiction of buy,sell,hold features. the accuaracy is not that great. need a lot of imporvement.
 
 Python Modules used in this projects are:
 
