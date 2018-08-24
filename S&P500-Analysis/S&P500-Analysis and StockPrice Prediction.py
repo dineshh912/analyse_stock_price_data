@@ -1,19 +1,18 @@
 import bs4 as bs
 import datetime as dt
-import os
+import os, pickle, requests, time
 import pandas as pd
 import pandas_datareader.data as web
 import matplotlib.pyplot as plt
 from matplotlib import style
 from collections import Counter
 import numpy as np
-import pickle
-import requests
-import time
 from sklearn import svm, cross_validation, neighbors
 from sklearn.ensemble import VotingClassifier, RandomForestClassifier
+from statistics import mean
 
 style.use('ggplot')
+
 
 def save_sp500_tickers():
     resp = requests.get('https://www.slickcharts.com/sp500')
@@ -68,6 +67,8 @@ def combine_data():
         #df['{}_HL_pct_diff'.format(ticker)] = (df['High'] - df['Low']) / df['Low']
         #df['{}_daily_pct_chng'.format(ticker)] = (df['Close'] - df['Open']) / df['Open']
 
+        #df['{}'.format(ticker)] = (df['Close'] - df['Open']) / df['Open']
+
         df.rename(columns={'Adj Close':ticker}, inplace=True)
         df.drop(['Open','High','Low','Close','Volume'],1,inplace=True)
 
@@ -77,7 +78,6 @@ def combine_data():
             main_df = main_df.join(df, how='outer')
 
     main_df.to_csv('stock_df/sp500_combine_closes.csv')
-
 
 def visualize_data():
     df = pd.read_csv('0-Data/sp500_combine_closes.csv')
@@ -171,12 +171,28 @@ def ml_training(ticker):
                             #('rfor',RandomForestClassifier())])
     clf.fit(X_train, y_train)
     confidence = clf.score(X_test, y_test)
-    print('accuracy:',confidence)
+    #print('accuracy:',confidence)
     predictions = clf.predict(X_test)
-    print('predicted class counts:',Counter(predictions))
+    #print('predicted class counts:',Counter(predictions))
+    return confidence
+    
 
 
-ml_training('AAPL')
+def train_all_data():
+    with open("0-Data/sp500tickers.pickle","rb") as f:
+        tickers = pickle.load(f)
+
+    accuracies = []
+    for count,ticker in enumerate(tickers):
+
+        if count%10==0:
+            print(count)
+
+        accuracy = ml_training(ticker)
+        accuracies.append(accuracy)
+        print("{} accuracy: {}. Average accuracy:{}".format(ticker,accuracy,mean(accuracies)))
+
+train_all_data()
     
 
 #get_data_from_yahoo()   
