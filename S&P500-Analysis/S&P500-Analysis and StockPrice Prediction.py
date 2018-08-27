@@ -111,7 +111,7 @@ def visualize_data():
     plt.show()
 
 def process_data_labels(ticker):
-    days = 5
+    days = 7
     df = pd.read_csv('0-Data/sp500_combine_closes.csv', index_col = 0)
     tickers = df.columns.values.tolist()
     df.fillna(0, inplace=True)
@@ -127,9 +127,9 @@ def buy_sell_hold(*args):
     columns = [c for c in args]
     requirement = 0.02
     for col in columns:
-        if col > requirement:
+        if col > 0.028:
             return 1
-        if col < -requirement:
+        if col < -0.027:
             return -1
     return 0
 
@@ -141,7 +141,9 @@ def extract_featuresets(ticker):
                                                df['{}_2d'.format(ticker)],
                                                df['{}_3d'.format(ticker)],
                                                df['{}_4d'.format(ticker)],
-                                               df['{}_5d'.format(ticker)]
+                                               df['{}_5d'.format(ticker)],
+                                               df['{}_6d'.format(ticker)],
+                                               df['{}_7d'.format(ticker)]
                                                                  ))
     vals = df['{}_target'.format(ticker)].values.tolist()
     str_vals = [str(i) for i in vals]
@@ -165,17 +167,18 @@ def ml_training(ticker):
     X_train, X_test, y_train, y_test = cross_validation.train_test_split(X,
                                                         y,
                                                         test_size=0.25)
-    clf = neighbors.KNeighborsClassifier()
-    #clf = VotingClassifier([('lsvc',svm.LinearSVC()),
-                            #('knn',neighbors.KNeighborsClassifier()),
-                            #('rfor',RandomForestClassifier())])
+    #clf = neighbors.KNeighborsClassifier()
+    clf = VotingClassifier([('lsvc',svm.LinearSVC()),
+                            ('knn',neighbors.KNeighborsClassifier()),
+                            ('rfor',RandomForestClassifier())])
     clf.fit(X_train, y_train)
     confidence = clf.score(X_test, y_test)
-    #print('accuracy:',confidence)
+    print('accuracy:',confidence)
     predictions = clf.predict(X_test)
-    #print('predicted class counts:',Counter(predictions))
+    print('predicted class counts:',Counter(predictions))
     return confidence
-    
+
+ml_training('XOM')    
 
 
 def train_all_data():
@@ -192,7 +195,7 @@ def train_all_data():
         accuracies.append(accuracy)
         print("{} accuracy: {}. Average accuracy:{}".format(ticker,accuracy,mean(accuracies)))
 
-train_all_data()
+#train_all_data()
     
 
 #get_data_from_yahoo()   
