@@ -63,11 +63,6 @@ def combine_data():
     for ticker in tickers:
         df = pd.read_csv('stock_df/{}.csv'.format(ticker))
         df.set_index('Date', inplace=True)
-        
-        #df['{}_HL_pct_diff'.format(ticker)] = (df['High'] - df['Low']) / df['Low']
-        #df['{}_daily_pct_chng'.format(ticker)] = (df['Close'] - df['Open']) / df['Open']
-
-        #df['{}'.format(ticker)] = (df['Close'] - df['Open']) / df['Open']
 
         df.rename(columns={'Adj Close':ticker}, inplace=True)
         df.drop(['Open','High','Low','Close','Volume'],1,inplace=True)
